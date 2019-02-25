@@ -1,1 +1,4 @@
-# Defaults meta for role mirror-qa
+---
+dependencies:
+  - { role: baseline }
+

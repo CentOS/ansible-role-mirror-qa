@@ -1,0 +1,51 @@
+#!/bin/bash
+
+localhostname=$(hostname)
+
+if [ "$1" = "$localhostname" ] ;then
+ exit 0
+fi
+
+cd /home/{{ mirror_qa_local_user }}-scripts
+SYNCTIME=`date +%Y%m%d%H%M`
+lockfile="/home/{{ mirror_qa_local_user }}-scripts/rsync-qa.pid"
+running="yes"
+
+do_rsync() {
+
+rsync --force --partial --exclude ".~tmp~" --exclude ".*iso.*" --exclude ".*.rpm.*" --exclude FOOTER.html --delay-updates --exclude repodata --exclude headers --timeout=1200 -avzH $1::{{ mirror_qa_rsync_from_module }}/ {{ mirror_qa_local_path }}  > /home/{{ mirror_qa_local_user }}-scripts/$SYNCTIME-qa.log 2>&1 
+rsync --force --partial --exclude ".~tmp~" --exclude ".*iso.*" --exclude ".*.rpm.*" --exclude FOOTER.html --delay-updates --timeout=1200 --delete -avzH $1::{{ mirror_qa_rsync_from_module }}/ {{ mirror_qa_local_path }}  >> /home/{{ mirror_qa_local_user }}-scripts/$SYNCTIME-qa.log 2>&1
+
+for log in `ls *.log | grep "qa" `
+  do
+   if [ "$log" != "$SYNCTIME-qa.log" ]; then
+    rm -f $log
+   fi
+  done
+
+}
+
+if [ -z $1 ]; then 
+  echo "need a machine name to rsync from as the first param to this script"
+  exit 1
+fi
+
+if [ ! -e ${lockfile} ]; then
+   trap 'rm -f "$lockfile"; exit $?' INT TERM EXIT
+   echo "$$" > $lockfile
+   do_rsync $1 
+
+   rm -f "$lockfile"
+   trap - INT TERM EXIT
+else
+   proc=$(cat ${lockfile})
+   if [ $(ps -eopid | grep -c $proc) -eq 1 ]; then
+     #still running
+     echo "Old process still running"
+     exit 27
+   else
+     #old process dead
+     rm -f ${lockfile}
+   fi
+fi
+

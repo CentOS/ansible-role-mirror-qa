@@ -1,0 +1,30 @@
+<VirtualHost *:80>
+     ServerAdmin webmaster@centos.org
+     ServerName qa.centos.org
+     ServerAlias {{ inventory_hostname }}
+     AddDescription "{{ inventory_hostname }}" server.id
+     DocumentRoot {{ mirror_qa_local_path }}
+     CustomLog logs/qa.centos.org_access.log combined
+     ErrorLog logs/qa.centos.org_error.log
+
+ Header always set Strict-Transport-Security "max-age=31536000"                                                   
+ Header always set X-Frame-Options "SAMEORIGIN"
+ Header always set X-Xss-Protection "1; mode=block"
+ Header always set X-Content-Type-Options "nosniff"
+ Header always set Referrer-Policy "same-origin"
+
+<Directory "{{ mirror_qa_local_path }}">
+    Options Indexes FollowSymLinks 
+    AllowOverride None
+    <IfVersion < 2.4>
+     Order allow,deny
+     Allow from {% for host in groups['hostgroup-role-mirror-qa'] %}{{ hostvars[host].ip }} {% if hostvars[host].ipv6 is defined %}{{ hostvars[host].ipv6 }} {% endif %}{% endfor %}{% for ip in mirror_qa_allow_from %}{{ ip }} {% endfor %}
+
+   </IfVersion>
+   <IfVersion >= 2.4>
+     IndexOptions FancyIndexing VersionSort NameWidth=* HTMLTable Charset=UTF-8
+     Require ip {% for host in groups['hostgroup-role-mirror-qa'] %}{{ hostvars[host].ip }} {% if hostvars[host].ipv6 is defined %}{{ hostvars[host].ipv6 }} {% endif %}{% endfor %}{% for ip in mirror_qa_allow_from %}{{ ip }} {% endfor %}
+ 
+   </IfVersion>
+</Directory>
+</VirtualHost>

@@ -1,1 +1,28 @@
-# Defaults variables for role mirror-qa
+# default variables for mirror-qa role
+
+# Full rsync path::module to use to rsync centos mirror content from
+mirror_qa_rsync_from: node1.centos.org
+mirror_qa_rsync_from_module: c5beta-qa
+
+# default path where to sync content to
+mirror_qa_local_path: /home/qa/
+
+# Default user owning all the files
+mirror_qa_local_user: centos
+
+# Do we also want to become member of the QA network
+# So opening up rsyncd to allowed ip to let them sync from us 
+mirror_qa_rsyncd: True
+
+# We'll parse inventory to allow some IPs based on hostgroup-role-mirror-qa vars
+# But we can also add other ones (outside of ansible for example), like from QA team members
+# ACL list will be used for both rsync and httpd access
+mirror_qa_allow_from:
+  - 192.168.1.1
+  - 172.16.31.230
+
+# Zabbix/monitoring part
+mirror_qa_zabbix_templates:
+  - Template CentOS http server
+mirror_qa_zabbix_groups:
+  - CentOS - Open QA servers
