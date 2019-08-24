@@ -9,7 +9,9 @@
     dest: /etc/httpd/conf.d/60_qa.conf
   notify:
     - restart_httpd
- 
+  tags:
+    - acl
+
 - name: Ensuring some selinux booleans are enabled
   seboolean:
     name: "{{ item }}"
@@ -34,5 +36,7 @@
 
 - include_tasks: rsyncd.yml
   when: mirror_qa_rsyncd
+  tags:
+    - acl
 
 - include_tasks: monitoring.yml  

@@ -22,7 +22,7 @@ mirror_qa_allow_from:
   - 172.16.31.230
 
 # Zabbix/monitoring part
-mirror_qa_zabbix_templates:
-  - Template CentOS http server
+mirror_qa_zabbix_templates: []
+#  - Template CentOS http server
 mirror_qa_zabbix_groups:
   - CentOS - Open QA servers

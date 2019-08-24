@@ -7,6 +7,8 @@
     dest: /etc/rsyncd.d/06_qateam.conf
   notify:
     - rebuild_rsyncd
+  tags:
+    - acl
 
 - name: Needed selinux booleans for rsyncd
   seboolean:
