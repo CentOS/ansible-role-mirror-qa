@@ -8,7 +8,7 @@
     src: 60_qa.conf.j2
     dest: /etc/httpd/conf.d/60_qa.conf
   notify:
-    - restart_httpd
+    - reload_httpd
   tags:
     - acl
 
