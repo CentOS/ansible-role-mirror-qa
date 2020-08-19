@@ -5,6 +5,7 @@
   template:
     src: 06_qateam.conf.j2
     dest: /etc/rsyncd.d/06_qateam.conf
+    mode: 0644
   notify:
     - rebuild_rsyncd
   tags:
